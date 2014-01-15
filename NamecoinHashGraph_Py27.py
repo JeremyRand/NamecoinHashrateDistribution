@@ -38,7 +38,7 @@ url = 'https://blockchain.info/q/getblockcount'
 params = dict()
 resp = requests.get(url=url, params=params)
 data = json.loads(resp.content.decode('unicode-escape'))
-print 'BTC block count: ', str(data)
+print 'BTC block count:', str(data)
 btcheight = data
 
 # get BTC hashrate
@@ -49,7 +49,7 @@ rawpage = resp.content.decode()
 start = rawpage.find('(avg. yesterday) </td><td id="tdid15">\n') + len('(avg. yesterday) </td><td id="tdid15">\n')
 end = rawpage.find(' Phash/s', start)
 btchashrate = json.loads(rawpage[start:end])
-print 'BTC hashrate: ', str(btchashrate)
+print 'BTC hashrate:', str(btchashrate)
 
 # get NMC hashrate
 url = 'http://bitinfocharts.com/namecoin/'
@@ -59,7 +59,7 @@ rawpage = resp.content.decode()
 start = rawpage.find('(avg. yesterday) </td><td id="tdid15">\n') + len('(avg. yesterday) </td><td id="tdid15">\n')
 end = rawpage.find(' Phash/s', start)
 nmchashrate = json.loads(rawpage[start:end])
-print 'NMC hashrate: ', str(nmchashrate)
+print 'NMC hashrate:', str(nmchashrate)
 
 for poolname in config.sections():
     
@@ -87,11 +87,11 @@ for poolname in config.sections():
         if(block['height'] > btcheight - 100):
             poolblocks[poolname] = poolblocks[poolname] + 1
     
-    print poolname, ' had ', poolblocks[poolname], '% of BTC hashrate in last 100 blocks.'
+    print poolname, 'had', poolblocks[poolname], '% of BTC hashrate in last 100 blocks.'
     
     nmcpercentage[poolname] = poolblocks[poolname] * btchashrate / nmchashrate 
     
-    print poolname, ' has ', nmcpercentage[poolname], '% of NMC hashrate.'
+    print poolname, 'has', nmcpercentage[poolname], '% of NMC hashrate.'
 
 sorted_nmcpercentage = sorted(nmcpercentage.items(), key=lambda x: x[1], reverse=True)
     

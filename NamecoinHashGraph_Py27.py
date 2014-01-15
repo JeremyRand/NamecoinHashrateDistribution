@@ -30,6 +30,8 @@ poolblocks = {}
 nmcpercentage = {}
 btcdifficulty = 0
 nmcdifficulty = 0
+btchashrate = 0
+nmchashrate = 0
 
 # get BTC height
 url = 'https://blockchain.info/q/getblockcount'
@@ -39,26 +41,25 @@ data = json.loads(resp.content.decode('unicode-escape'))
 print 'BTC block count: ', str(data)
 btcheight = data
 
-# get BTC difficulty
-url = 'https://blockchain.info/q/getdifficulty'
-params = dict()
-resp = requests.get(url=url, params=params)
-data = json.loads(resp.content.decode('unicode-escape'))
-print 'BTC difficulty: ', str(data)
-btcdifficulty = data
-
-# get NMC difficulty
-#url = 'http://dot-bit.org/tools/namecoinCalculator.php'
-url = 'http://blockchained.com/namecoin/'
+# get BTC hashrate
+url = 'http://bitinfocharts.com/bitcoin/'
 params = dict()
 resp = requests.get(url=url, params=params)
 rawpage = resp.content.decode()
-#start = rawpage.find("Current difficulty : ") + len("Current difficulty : ")
-start = rawpage.find("Current difficulty: ") + len("Current difficulty: ")
-end = rawpage.find(" (", start)
-nmcdifficulty = json.loads(rawpage[start:end])
-print 'NMC difficulty: ', str(nmcdifficulty)
+start = rawpage.find('(avg. yesterday) </td><td id="tdid15">\n') + len('(avg. yesterday) </td><td id="tdid15">\n')
+end = rawpage.find(' Phash/s', start)
+btchashrate = json.loads(rawpage[start:end])
+print 'BTC hashrate: ', str(btchashrate)
 
+# get NMC hashrate
+url = 'http://bitinfocharts.com/namecoin/'
+params = dict()
+resp = requests.get(url=url, params=params)
+rawpage = resp.content.decode()
+start = rawpage.find('(avg. yesterday) </td><td id="tdid15">\n') + len('(avg. yesterday) </td><td id="tdid15">\n')
+end = rawpage.find(' Phash/s', start)
+nmchashrate = json.loads(rawpage[start:end])
+print 'NMC hashrate: ', str(nmchashrate)
 
 for poolname in config.sections():
     
@@ -88,7 +89,7 @@ for poolname in config.sections():
     
     print poolname, ' had ', poolblocks[poolname], '% of BTC hashrate in last 100 blocks.'
     
-    nmcpercentage[poolname] = poolblocks[poolname] * btcdifficulty / nmcdifficulty 
+    nmcpercentage[poolname] = poolblocks[poolname] * btchashrate / nmchashrate 
     
     print poolname, ' has ', nmcpercentage[poolname], '% of NMC hashrate.'
 
@@ -96,4 +97,4 @@ sorted_nmcpercentage = sorted(nmcpercentage.items(), key=lambda x: x[1], reverse
     
 json_out = open(config.get('DEFAULT','output'), 'w')
 
-json.dump({"data":sorted_nmcpercentage,"last-modified":str(datetime.now())}, json_out)
+json.dump({"data":sorted_nmcpercentage,"last-modified":str(datetime.now()),"data-sources":"VECLabs.net, Blockchain.info, BitInfoCharts.com"}, json_out)

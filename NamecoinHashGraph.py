@@ -32,6 +32,7 @@ btcdifficulty = 0
 nmcdifficulty = 0
 btchashrate = 0
 nmchashrate = 0
+nmcother = 100
 
 # get BTC height
 url = 'https://blockchain.info/q/getblockcount'
@@ -92,9 +93,15 @@ for poolname in config:
     
     nmcpercentage[poolname] = poolblocks[poolname] * btchashrate / nmchashrate  
     
+    nmcother = nmcother - nmcpercentage[poolname]
+    
     print(poolname, 'has', nmcpercentage[poolname], '% of NMC hashrate.')
 
 sorted_nmcpercentage = sorted(nmcpercentage.items(), key=lambda x: x[1], reverse=True)
+
+sorted_nmcpercentage.append(["Other", nmcother])
+
+print("Other:", nmcother, "% of NMC hashrate.")
     
 json_out = open(config['DEFAULT']['output'], 'w')
 

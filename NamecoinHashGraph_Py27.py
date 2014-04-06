@@ -28,8 +28,6 @@ nmcheight = 0
 pooldata = {}
 poolblocks = {}
 nmcpercentage = {}
-btcdifficulty = 0
-nmcdifficulty = 0
 btchashrate = 0
 nmchashrate = 0
 nmcother = 100
@@ -42,25 +40,21 @@ data = json.loads(resp.content.decode('unicode-escape'))
 print 'BTC block count:', str(data)
 btcheight = data
 
-# get BTC hashrate
-url = 'http://bitinfocharts.com/bitcoin/'
+# get BTC next difficulty
+url = 'http://dot-bit.org/tools/difficulty_bitcoin.txt'
 params = dict()
 resp = requests.get(url=url, params=params)
 rawpage = resp.content.decode()
-start = rawpage.find('(avg. yesterday) </td><td id="tdid15">\n') + len('(avg. yesterday) </td><td id="tdid15">\n')
-end = rawpage.find(' Phash/s', start)
-btchashrate = json.loads(rawpage[start:end])
-print 'BTC hashrate:', str(btchashrate)
+btchashrate = json.loads(rawpage)
+print 'BTC next difficulty:', str(btchashrate)
 
-# get NMC hashrate
-url = 'http://bitinfocharts.com/namecoin/'
+# get NMC next difficulty
+url = 'http://dot-bit.org/tools/difficulty_namecoin_estimate.txt'
 params = dict()
 resp = requests.get(url=url, params=params)
 rawpage = resp.content.decode()
-start = rawpage.find('(avg. yesterday) </td><td id="tdid15">\n') + len('(avg. yesterday) </td><td id="tdid15">\n')
-end = rawpage.find(' Phash/s', start)
-nmchashrate = json.loads(rawpage[start:end])
-print 'NMC hashrate:', str(nmchashrate)
+nmchashrate = json.loads(rawpage)
+print 'NMC next difficulty:', str(nmchashrate)
 
 for poolname in config.sections():
     
@@ -104,4 +98,4 @@ print "Other:", nmcother, "% of NMC hashrate."
 
 json_out = open(config.get('DEFAULT','output'), 'w')
 
-json.dump({"data":sorted_nmcpercentage,"last-modified":str(datetime.now()),"data-sources":"VECLabs.net, Blockchain.info, BitInfoCharts.com"}, json_out)
+json.dump({"data":sorted_nmcpercentage,"last-modified":str(datetime.now()),"data-sources":"VECLabs.net, Blockchain.info, Dot-Bit.org"}, json_out)

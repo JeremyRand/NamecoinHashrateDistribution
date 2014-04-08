@@ -85,9 +85,9 @@ for poolname in config:
     
     print(poolname, 'had', poolblocks[poolname], '% of BTC hashrate in last 100 blocks.')
     
-    nmcpercentage[poolname] = poolblocks[poolname] * btchashrate / nmchashrate  
+    nmcpercentage[poolname] = max(poolblocks[poolname] * btchashrate / nmchashrate, 0)
     
-    nmcother = nmcother - nmcpercentage[poolname]
+    nmcother = max(nmcother - nmcpercentage[poolname], 0)
     
     print(poolname, 'has', nmcpercentage[poolname], '% of NMC hashrate.')
 
